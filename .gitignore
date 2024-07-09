@@ -1,0 +1,5 @@
+.idea
+testCases/bmp.log
+testCases/server.log
+*.pyc
+__pycache__/
