@@ -1,0 +1,21 @@
+Running BrowserMob Proxy using LittleProxy implementation. To revert to the legacy implementation, run the proxy with the command-line option '--use-littleproxy false'.
+[INFO  2024-05-18T19:48:17,675 net.lightbody.bmp.proxy.Main] (main) Starting BrowserMob Proxy version 2.1.4 
+[INFO  2024-05-18T19:48:17,704 org.eclipse.jetty.util.log] (main) jetty-7.x.y-SNAPSHOT 
+[INFO  2024-05-18T19:48:17,752 org.eclipse.jetty.util.log] (main) started o.e.j.s.ServletContextHandler{/,null} 
+[INFO  2024-05-18T19:48:17,954 org.eclipse.jetty.util.log] (main) Started SelectChannelConnector@0.0.0.0:50268 
+[INFO  2024-05-18T19:48:24,365 org.littleshoot.proxy.impl.DefaultHttpProxyServer] (qtp1489933928-16) Starting proxy at address: 0.0.0.0/0.0.0.0:8081 
+[INFO  2024-05-18T19:48:24,380 org.littleshoot.proxy.impl.DefaultHttpProxyServer] (qtp1489933928-16) Proxy listening with TCP transport 
+[INFO  2024-05-18T19:48:29,474 org.littleshoot.proxy.impl.DefaultHttpProxyServer] (qtp1489933928-16) Proxy started at address: /0:0:0:0:0:0:0:0:8081 
+[WARN  2024-05-18T19:48:30,251 net.lightbody.bmp.mitm.util.SslUtil] (LittleProxy-0-ClientToProxyWorker-1) Disabling upstream server certificate verification. This will allow attackers to intercept communications with upstream servers. 
+[INFO  2024-05-18T19:48:42,783 org.littleshoot.proxy.impl.ClientToProxyConnection] (LittleProxy-0-ClientToProxyWorker-3) (NEGOTIATING_CONNECT) [id: 0x70a23baf, L:/0:0:0:0:0:0:0:1:8081 - R:/0:0:0:0:0:0:0:1:50335]: An IOException occurred on ClientToProxyConnection: Connection reset by peer 
+[INFO  2024-05-18T19:48:42,782 org.littleshoot.proxy.impl.ClientToProxyConnection] (LittleProxy-0-ClientToProxyWorker-4) (NEGOTIATING_CONNECT) [id: 0xec949b85, L:/0:0:0:0:0:0:0:1:8081 - R:/0:0:0:0:0:0:0:1:50336]: An IOException occurred on ClientToProxyConnection: Connection reset by peer 
+[INFO  2024-05-18T19:48:42,797 org.littleshoot.proxy.impl.ProxyToServerConnection] (LittleProxy-0-ProxyToServerWorker-3) (DISCONNECTED) [id: 0xdf29555e, L:0.0.0.0/0.0.0.0:50337]: Connection to upstream server failed java.nio.channels.ClosedChannelException: null
+	at io.netty.handler.ssl.SslHandler.channelInactive(...)(Unknown Source) ~[browsermob-dist-2.1.4.jar:?]
+
+[INFO  2024-05-18T19:48:42,797 org.littleshoot.proxy.impl.ProxyToServerConnection] (LittleProxy-0-ProxyToServerWorker-4) (DISCONNECTED) [id: 0x56c846ab, L:0.0.0.0/0.0.0.0:50338]: Connection to upstream server failed java.nio.channels.ClosedChannelException: null
+	at io.netty.handler.ssl.SslHandler.channelInactive(...)(Unknown Source) ~[browsermob-dist-2.1.4.jar:?]
+
+[INFO  2024-05-18T19:48:42,815 org.littleshoot.proxy.impl.DefaultHttpProxyServer] (qtp1489933928-18) Shutting down proxy server gracefully 
+[INFO  2024-05-18T19:48:42,815 org.littleshoot.proxy.impl.DefaultHttpProxyServer] (qtp1489933928-18) Closing all channels (graceful) 
+[INFO  2024-05-18T19:48:42,823 org.littleshoot.proxy.impl.ServerGroup] (qtp1489933928-18) Shutting down server group event loops (graceful) 
+[INFO  2024-05-18T19:48:45,065 org.littleshoot.proxy.impl.DefaultHttpProxyServer] (qtp1489933928-18) Done shutting down proxy server 
