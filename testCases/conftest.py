@@ -1,8 +1,11 @@
 import pytest
-from selenium import webdriver
+from seleniumwire import webdriver
 from pytest_metadata.plugin import metadata_key
-from browsermobproxy import Server
+# from browsermobproxy import Server
 import socket
+
+req_count = 0
+res_count = 0
 
 
 def get_free_tcp_port():
@@ -12,6 +15,21 @@ def get_free_tcp_port():
     s.close()
     print('\nrunning server in this port {0}'.format(addr[1]))
     return addr[1]
+
+
+def request_interceptor(request):
+    print("request_interceptor.request --> ", request)
+    global req_count
+    req_count += 1
+    print("request_interceptor.req_count ", req_count)
+
+
+def response_interceptor(request, response):
+    print("response_interceptor.request --> ", request)
+    print("response_interceptor.response --> ", response)
+    global res_count
+    res_count += 1
+    print("res_count ", res_count)
 
 
 @pytest.fixture()
@@ -33,6 +51,8 @@ def setup(browser):
             # chrome_options.add_argument('--proxy-server={0}'.format(proxy.proxy))
             chrome_options.add_argument('ignore-certificate-errors')
             driver = webdriver.Chrome(options=chrome_options)
+    driver.request_interceptor = request_interceptor
+    driver.response_interceptor = response_interceptor
     yield driver
     driver.close()
     driver.quit()
