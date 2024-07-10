@@ -1,7 +1,8 @@
 .idea
 testCases/bmp.log
 testCases/server.log
-*.pyc
+**/**.*pyc
+**/__pycache__/
 __pycache__/
 bmp.log
 server.log

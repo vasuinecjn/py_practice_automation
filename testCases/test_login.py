@@ -8,11 +8,9 @@ import inspect
 class Test001Login:
 
     def test_homepage_title(self, setup):
-        self.server, self.proxy, self.driver = setup
-        self.proxy.new_har('./Har/test_homepage_title')
+        self.driver = setup
         print('\nnavigating to the base url {0}'.format(Properties.get_property('baseURL')))
         self.driver.get(Properties.get_property('baseURL'))
-        self.proxy.wait_for_traffic_to_stop(1, 60)
         actual_title = self.driver.title
         if actual_title == 'Your store. Login':
             assert True
@@ -21,10 +19,8 @@ class Test001Login:
             assert False
 
     def test_login(self, setup):
-        self.server, self.proxy, self.driver = setup
-        self.proxy.new_har('./Har/test_login')
+        self.driver = setup
         self.driver.get(Properties.get_property('baseURL'))
-        self.proxy.wait_for_traffic_to_stop(1, 60)
         self.loginPage = LoginPage(self.driver)
         self.loginPage.set_email(Properties.get_property('email'))
         self.loginPage.set_password(Properties.get_property('password'))

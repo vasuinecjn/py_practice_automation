@@ -16,28 +16,28 @@ def get_free_tcp_port():
 
 @pytest.fixture()
 def setup(browser):
-    server = Server('//browsermob-proxy-2.1.4/bin/browsermob-proxy',
-                    {'port': get_free_tcp_port()})
-    server.start()
-    proxy = server.create_proxy(params={'trustAllServers': 'true'})
+    # server = Server('//browsermob-proxy-2.1.4/bin/browsermob-proxy',
+    #                 {'port': get_free_tcp_port()})
+    # server.start()
+    # proxy = server.create_proxy(params={'trustAllServers': 'true'})
     match browser:
         case 'chrome':
             chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument('--proxy-server={0}'.format(proxy.proxy))
+            # chrome_options.add_argument('--proxy-server={0}'.format(proxy.proxy))
             chrome_options.add_argument('ignore-certificate-errors')
             driver = webdriver.Chrome(options=chrome_options)
         case 'firefox':
             driver = webdriver.Firefox()
         case _:
             chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument('--proxy-server={0}'.format(proxy.proxy))
+            # chrome_options.add_argument('--proxy-server={0}'.format(proxy.proxy))
             chrome_options.add_argument('ignore-certificate-errors')
             driver = webdriver.Chrome(options=chrome_options)
-    yield server, proxy, driver
+    yield driver
     driver.close()
     driver.quit()
-    proxy.close()
-    server.stop()
+    # proxy.close()
+    # server.stop()
 
 
 def pytest_addoption(parser):  #This will get the value from CLI /hooks
