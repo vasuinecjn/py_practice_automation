@@ -7,3 +7,4 @@ __pycache__/
 bmp.log
 server.log
 .project
+logs/pytest-logs.txt
