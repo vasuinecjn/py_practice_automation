@@ -6,3 +6,4 @@ testCases/server.log
 __pycache__/
 bmp.log
 server.log
+.project
