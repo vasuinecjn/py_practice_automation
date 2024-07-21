@@ -1,6 +1,6 @@
 .idea
-testCases/bmp.log
-testCases/server.log
+tests/bmp.log
+tests/server.log
 **/**.*pyc
 *.pyc
 **/__pycache__/
@@ -9,3 +9,4 @@ bmp.log
 server.log
 logs/pytest-logs.txt
 .project
+reports/
