@@ -1,0 +1,30 @@
+{
+    "login": {
+        "adminCredentials": {
+            "userName": "Admin",
+            "password": "admin123"
+        },
+        "nonAdminCredentials": {
+            "userName": "Admin",
+            "password": "admin123"
+        }
+    },
+    "addUser": {
+        "adminEnabledUser": {
+            "userRole": "Admin",
+            "employeeName": "Ravi M B",
+            "status": "Enabled",
+            "userName": "vasuinecjn",
+            "password": "testCase@143",
+            "confirmPassword": "testCase@143"
+        },
+        "ESSEnabledUser": {
+            "userRole": "ESS",
+            "employeeName": "Ravi M B",
+            "status": "Enabled",
+            "userName": "vasuinecjn",
+            "password": "testCase@143",
+            "confirmPassword": "testCase@143"
+        }
+    }
+}
