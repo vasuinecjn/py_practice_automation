@@ -51,7 +51,8 @@ def pytest_generate_tests(metafunc):
         for case in data:
             if not case["isSkip"]:
                 test_cases.append(case)
-        metafunc.parametrize("test_case", test_cases)
+        ids = [test["testName"] for test in test_cases]
+        metafunc.parametrize("test_case", test_cases, ids=ids)
 
 
 
