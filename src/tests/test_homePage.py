@@ -1,5 +1,5 @@
 from .baseTest import BaseTest
-from .constants import TestConstants
+from src.constants import TestConstants
 
 
 class TestHomePage(BaseTest):

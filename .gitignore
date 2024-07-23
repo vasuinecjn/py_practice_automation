@@ -1,6 +1,6 @@
 .idea
-tests/bmp.log
-tests/server.log
+src/tests/bmp.log
+src/tests/server.log
 **/**.*pyc
 *.pyc
 **/__pycache__/

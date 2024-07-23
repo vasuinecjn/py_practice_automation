@@ -1,5 +1,5 @@
 from src.pageObjects.login_page_object import LoginPage
-from src.tests.constants import TestConstants
+from src.constants import TestConstants
 
 
 class Application:
