@@ -4,13 +4,26 @@ from selenium import webdriver
 import json
 from pathlib import Path
 
+import settings
+from application import Application
 
-@pytest.fixture(params=["chrome"], scope="function")
-def init_test(request):
+
+def pytest_addoption(parser):
+    parser.addoption("--browser", action="store", default=settings.browser)
+
+
+@pytest.fixture
+def get_browser(request):
+    return request.config.getoption("--browser")
+
+
+@pytest.fixture(scope="function")
+def init_test(request, get_browser):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('ignore-certificate-errors')
     driver = webdriver.Chrome(options=chrome_options)
     request.cls.driver = driver
+    request.cls.application = Application(driver)
     yield
     driver.close()
     driver.quit()
@@ -19,14 +32,17 @@ def init_test(request):
 def pytest_generate_tests(metafunc):
     test_cases = []
     file_name = metafunc.cls.__name__ + ".json"
-    test_cases_file_path = Path(__file__).parent.parent.joinpath("test_cases").joinpath(file_name)
+    test_cases_file_path = Path(__file__).parent.joinpath("test_cases").joinpath(file_name)
     if "test_case" in metafunc.fixturenames:
         with open(test_cases_file_path, "r") as f:
             data = json.load(f)
+        f.close()
         for case in data:
             if not case["isSkip"]:
                 test_cases.append(case)
         metafunc.parametrize("test_case", test_cases)
+
+
 
 # @pytest.fixture
 # def test_cases(request):
