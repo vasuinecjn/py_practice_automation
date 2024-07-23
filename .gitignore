@@ -10,3 +10,4 @@ server.log
 logs/pytest-logs.txt
 .project
 reports/
+screenshots/

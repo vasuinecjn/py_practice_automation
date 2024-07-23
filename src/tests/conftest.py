@@ -1,10 +1,13 @@
+from src.application import Application
+import settings
 import pytest
+import pytest_html
 from selenium import webdriver
 import json
 from pathlib import Path
+import re
 
-import settings
-from src.application import Application
+driver = None
 
 
 def pytest_addoption(parser):
@@ -22,6 +25,7 @@ def load_test_data():
             test_data_map[ki] = v
     return test_data_map
 
+
 @pytest.fixture
 def get_browser(request):
     return request.config.getoption("--browser")
@@ -29,6 +33,7 @@ def get_browser(request):
 
 @pytest.fixture(scope="function")
 def init_test(request, get_browser):
+    global driver
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('ignore-certificate-errors')
     driver = webdriver.Chrome(options=chrome_options)
@@ -54,20 +59,26 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("test_case", test_cases, ids=ids)
 
 
-
-# @pytest.fixture
-# def test_cases(request):
-#     # Extract the parameter value
-#     test_case_file = request.param
-#     test_cases = []
-#     with open(test_case_file, "r") as f:
-#         data = json.load(f)
-#     for case in data:
-#         if not case["isSkip"]:
-#             test_cases.append(case)
-#     return test_cases
-#
-
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    # Execute all other hooks to obtain the report object
+    # pytest_html = item.config.pluginmanager.getplugin("html")
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, "extra", [])
+    # Check if the test failed
+    if report.when == "call" or report.when == "setup":
+        xfail = hasattr(report, "wasxfail")
+        if (report.skipped and xfail) or (report.failed and not xfail):
+            m = re.search(r"\[([A-Za-z0-9_]+)\]", item.nodeid)
+            test_case = m.group(1)
+            file_name = Path.cwd().parent.parent.joinpath("screenshots").joinpath(test_case + ".png")
+            driver.get_screenshot_as_file(file_name)
+            if file_name:
+                html = "<div><img src='%s' alt='screenshot' style='width:304px;height:228px;'" \
+                        "onclick='window.open(this.src)' align='right'/></div>" % file_name
+                extra.append(pytest_html.extras.html(html))
+        report.extra = extra
 
 # def pytest_addoption(parser):  #This will get the value from CLI /hooks
 #     parser.addoption('--browser')

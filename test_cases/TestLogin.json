@@ -1,13 +1,13 @@
 [
     {
-        "testName": "add enabled admin user",
+        "testName": "add_enabled_admin_user",
         "isSkip": false,
         "tag": "smoke",
         "login": "adminCredentials",
         "addUser": "adminEnabledUser"
     },
     {
-        "testName": "add enabled Ess user",
+        "testName": "add_enabled_Ess_user",
         "isSkip": false,
         "tag": "smoke",
         "login": "adminCredentials",
