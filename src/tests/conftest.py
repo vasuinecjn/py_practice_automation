@@ -1,11 +1,10 @@
 import pytest
 from selenium import webdriver
-# from pytest_metadata.plugin import metadata_key
 import json
 from pathlib import Path
 
 import settings
-from application import Application
+from src.application import Application
 
 
 def pytest_addoption(parser):
@@ -14,7 +13,7 @@ def pytest_addoption(parser):
 
 def load_test_data():
     test_data_map = {}
-    data_path = Path.cwd().joinpath("test_data").joinpath("testData.json")
+    data_path = Path.cwd().parent.parent.joinpath("test_data").joinpath("testData.json")
     with open(data_path, "r") as f:
         data = json.load(f)
     f.close()
@@ -43,7 +42,7 @@ def init_test(request, get_browser):
 def pytest_generate_tests(metafunc):
     test_cases = []
     file_name = metafunc.cls.__name__ + ".json"
-    test_cases_file_path = Path(__file__).parent.joinpath("test_cases").joinpath(file_name)
+    test_cases_file_path = Path.cwd().parent.parent.joinpath("test_cases").joinpath(file_name)
     if "test_case" in metafunc.fixturenames:
         with open(test_cases_file_path, "r") as f:
             data = json.load(f)

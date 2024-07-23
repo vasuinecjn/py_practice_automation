@@ -1,4 +1,4 @@
-from pageObjects.page_object import Page
+from src.pageObjects.page_object import Page
 
 
 class HomePage(Page):

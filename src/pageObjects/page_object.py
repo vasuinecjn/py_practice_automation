@@ -13,7 +13,7 @@ class Page:
         self.test_data = test_data
         self.webDriverWait = WebDriverWait(self.driver, 10)
         locator_file_name = self.__class__.__name__ + ".json"
-        locator_file_path = Path(__file__).parent.parent.joinpath("objectRepository").joinpath(locator_file_name)
+        locator_file_path = Path(__file__).parent.parent.parent.joinpath("objectRepository").joinpath(locator_file_name)
         if self.__class__.__name__ not in Page.page_locators_map.keys():
             with open(locator_file_path, "r") as f:
                 data = json.load(f)

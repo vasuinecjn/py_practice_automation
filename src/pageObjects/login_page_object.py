@@ -1,5 +1,5 @@
-from pageObjects.page_object import Page
-from pageObjects.home_page_object import HomePage
+from src.pageObjects.page_object import Page
+from src.pageObjects.home_page_object import HomePage
 
 
 class LoginPage(Page):

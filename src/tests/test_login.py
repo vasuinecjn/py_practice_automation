@@ -1,5 +1,4 @@
-from .constants import TestConstants
-from .baseTest import BaseTest
+from src.tests.baseTest import BaseTest
 
 
 class TestLogin(BaseTest):
