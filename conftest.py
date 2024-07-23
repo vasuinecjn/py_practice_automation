@@ -12,6 +12,17 @@ def pytest_addoption(parser):
     parser.addoption("--browser", action="store", default=settings.browser)
 
 
+def load_test_data():
+    test_data_map = {}
+    data_path = Path.cwd().joinpath("test_data").joinpath("testData.json")
+    with open(data_path, "r") as f:
+        data = json.load(f)
+    f.close()
+    for k in data.keys():
+        for ki, v in data[k].items():
+            test_data_map[ki] = v
+    return test_data_map
+
 @pytest.fixture
 def get_browser(request):
     return request.config.getoption("--browser")
@@ -23,7 +34,7 @@ def init_test(request, get_browser):
     chrome_options.add_argument('ignore-certificate-errors')
     driver = webdriver.Chrome(options=chrome_options)
     request.cls.driver = driver
-    request.cls.application = Application(driver)
+    request.cls.application = Application(driver, load_test_data())
     yield
     driver.close()
     driver.quit()

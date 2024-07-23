@@ -8,8 +8,9 @@ from pathlib import Path
 class Page:
     page_locators_map = {}
 
-    def __init__(self, driver):
+    def __init__(self, driver, test_data):
         self.driver = driver
+        self.test_data = test_data
         self.webDriverWait = WebDriverWait(self.driver, 10)
         locator_file_name = self.__class__.__name__ + ".json"
         locator_file_path = Path(__file__).parent.parent.joinpath("objectRepository").joinpath(locator_file_name)
@@ -55,3 +56,8 @@ class Page:
 
     def get_locator(self, key):
         return Page.page_locators_map[self.__class__.__name__][key].split("|")
+
+    def get_data(self, test_data_key):
+        return self.test_data[test_data_key]
+
+

@@ -1,6 +1,5 @@
 {
-    "email_textbox": "id|Email",
-    "password_textbox": "id|Password",
-    "login_button": "css_selector|button.button-1.login-button",
-    "logout_link": "link_text|Logout"
+    "email_textbox": "name|username",
+    "password_textbox": "name|password",
+    "login_button": "css_selector|button[type='submit']"
 }

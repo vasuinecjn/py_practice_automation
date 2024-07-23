@@ -1,3 +1,4 @@
 {
-    "logout_link": "link_text|Logout"
+    "logout_link": "link_text|Logout",
+    "user_dropdown": "css_selector|.oxd-topbar-header-userarea span"
 }
