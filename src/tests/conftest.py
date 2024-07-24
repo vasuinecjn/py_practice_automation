@@ -80,6 +80,12 @@ def pytest_runtest_makereport(item, call):
                 extra.append(pytest_html.extras.html(html))
         report.extra = extra
 
+
+def pytest_html_report_title(report):
+    report.title = "Orange HRM Test Automation"
+
+
+
 # def pytest_addoption(parser):  #This will get the value from CLI /hooks
 #     parser.addoption('--browser')
 #
