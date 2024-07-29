@@ -37,6 +37,7 @@ def init_test(request, get_browser):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('ignore-certificate-errors')
     driver = webdriver.Chrome(options=chrome_options)
+    driver.maximize_window()
     request.cls.driver = driver
     request.cls.application = Application(driver, load_test_data())
     yield
