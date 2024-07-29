@@ -26,5 +26,20 @@
             "password": "testCase@143",
             "confirmPassword": "testCase@143"
         }
+    },
+    "addCandidate": {
+        "senior_qa_lead_candidate": {
+            "first_name": "first_name",
+            "middle_name": "first_name",
+            "last_name": "last_name",
+            "vacancy": "Senior QA Lead",
+            "email": "email",
+            "contact_number": "phone_number",
+            "resume": "test_data/files/resume.txt",
+            "keywords": "words",
+            "date_of_application": "date",
+            "notes": "words",
+            "consent_to_keep_data": true
+        }
     }
 }

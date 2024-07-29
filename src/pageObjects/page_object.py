@@ -1,9 +1,22 @@
+import time
+
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
 import json
 from pathlib import Path
+from src.utilities.stringUtils import replace_locator_placeholders
+
+
+def click_on(element):
+    element.click()
+
+
+def type_in(element: WebElement, value: str):
+    element.clear()
+    element.send_keys(value)
 
 
 class Page:
@@ -24,8 +37,10 @@ class Page:
             f.close()
             Page.page_locators_map[self.__class__.__name__] = data
 
-    def get_element(self, key: str):
+    def get_element(self, key: str, *args):
         locator_type, locator_value = self.get_locator(key)
+        if len(args) > 0:
+            locator_value = replace_locator_placeholders(locator_value, args[0])
 
         def wait_and_get_element(by, lv):
             return self.webDriverWait.until(ec.visibility_of_element_located((by, lv)))
@@ -50,18 +65,18 @@ class Page:
             case _:
                 return None
 
-    def click_on(self, locator: str):
-        self.get_element(locator).click()
-
-    def type_in(self, locator: str, value: str):
-        element = self.get_element(locator)
-        element.clear()
-        element.send_keys(value)
-
     def get_locator(self, key):
         return Page.page_locators_map[self.__class__.__name__][key].split("|")
 
     def get_data(self, test_data_key):
         return self.test_data[test_data_key]
+
+    def logout(self):
+        time.sleep(5)
+        # assert self.expected == 5
+        click_on(self.get_element("user_dropdown"))
+        click_on(self.get_element("logout_link"))
+        from src.pageObjects.login_page_object import LoginPage
+        return LoginPage(self.driver, self.test_data)
 
 

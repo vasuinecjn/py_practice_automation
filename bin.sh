@@ -6,4 +6,5 @@ pip3 install -r requirements.txt
 rm -rf reports
 rm -rf screenshots
 mkdir screenshots
-pytest src/tests/test_login.py -sv -n 2 --browser chrome --html=reports/report.html
+#pytest src/tests/test_login.py -sv -n 2 --browser chrome --html=reports/report.html
+pytest src/tests/test_add_recruitment.py -sv -n 2 --browser chrome --html=reports/report.html

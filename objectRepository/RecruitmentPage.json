@@ -1,0 +1,22 @@
+{
+  "logout_link": "link_text|Logout",
+  "user_dropdown": "css_selector|.oxd-topbar-header-userarea span",
+  "candidate_link": "xpath|//a[normalize-space()='Candidates']",
+  "vacancies_link": "xpath|//a[normalize-space()='Vacancies']",
+  "add_candidate_button": "css_selector|div.orangehrm-candidate-page>.orangehrm-paper-container>.orangehrm-header-container button",
+  "ac_first_name": "css_selector|input[name='firstName']",
+  "ac_middle_name": "css_selector|input[name='middleName']",
+  "ac_last_name": "css_selector|input[name='lastName']",
+  "ac_vacancy_dropdown": "css_selector|div.oxd-select-wrapper",
+  "ac_vacancy_dropdown_list": "css_selector|div.oxd-select-dropdown.--positon-bottom",
+  "ac_vacancy_dropdown_option": "xpath|//div[span[normalize-space()='%{VACANCY}']]",
+  "ac_email_textbox": "xpath|//div[div/label[contains(text(),'Email')]]//input",
+  "ac_contact_number_textbox": "xpath|//div[div/label[contains(text(),'Contact Number')]]//input",
+  "ac_resume_upload_field": "css_selector|input[type='file']",
+  "ac_keywords_textbox": "css_selector|input[placeholder='Enter comma seperated words...']",
+  "ac_date_of_application_field": "css_selector|input[placeholder='yyyy-dd-mm']",
+  "ac_notes_textarea": "css_selector|textarea[placeholder='Type here']",
+  "ac_consent_to_keep_data_checkbox": "xpath|//div[div/label[normalize-space()='Consent to keep data']]//span",
+  "ac_save_button": "css_selector|button[type='submit']",
+  "ac_cancel_button": "xpath|//button[normalize-space()='Cancel']"
+}

@@ -1,0 +1,9 @@
+[
+    {
+        "testName": "Senior_QA_Lead",
+        "isSkip": false,
+        "tag": "smoke",
+        "login": "adminCredentials",
+        "addCandidate": "senior_qa_lead_candidate"
+    }
+]
