@@ -1,4 +1,4 @@
-from src.application import Application
+from .application import Application
 import settings
 import pytest
 import pytest_html
