@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 import json
 from pathlib import Path
 
@@ -24,7 +24,7 @@ class Page:
         locator_type, locator_value = self.get_locator(key)
 
         def wait_and_get_element(by, lv):
-            return self.webDriverWait.until(EC.visibility_of_element_located((by, lv)))
+            return self.webDriverWait.until(ec.visibility_of_element_located((by, lv)))
 
         match locator_type:
             case 'id':

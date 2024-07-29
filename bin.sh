@@ -1,4 +1,5 @@
 # shellcheck disable=SC2164
+pip install -r requirements.txt
 rm -rf reports
 rm -rf screenshots
 mkdir screenshots
