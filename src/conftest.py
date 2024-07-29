@@ -16,7 +16,7 @@ def pytest_addoption(parser):
 
 def load_test_data():
     test_data_map = {}
-    data_path = Path.cwd().parent.parent.joinpath("test_data").joinpath("testData.json")
+    data_path = Path.cwd().joinpath("test_data").joinpath("testData.json")
     with open(data_path, "r") as f:
         data = json.load(f)
     f.close()
@@ -47,7 +47,7 @@ def init_test(request, get_browser):
 def pytest_generate_tests(metafunc):
     test_cases = []
     file_name = metafunc.cls.__name__ + ".json"
-    test_cases_file_path = Path.cwd().parent.parent.joinpath("test_cases").joinpath(file_name)
+    test_cases_file_path = Path.cwd().joinpath("test_cases").joinpath(file_name)
     if "test_case" in metafunc.fixturenames:
         with open(test_cases_file_path, "r") as f:
             data = json.load(f)
@@ -72,7 +72,7 @@ def pytest_runtest_makereport(item, call):
         if (report.skipped and xfail) or (report.failed and not xfail):
             m = re.search(r"\[([A-Za-z0-9_]+)\]", item.nodeid)
             test_case = m.group(1)
-            file_name = Path.cwd().parent.parent.joinpath("screenshots").joinpath(test_case + ".png")
+            file_name = Path.cwd().joinpath("screenshots").joinpath(test_case + ".png")
             driver.get_screenshot_as_file(file_name)
             if file_name:
                 html = "<div><img src='%s' alt='screenshot' style='width:304px;height:228px;'" \
