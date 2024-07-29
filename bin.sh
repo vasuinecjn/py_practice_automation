@@ -6,8 +6,6 @@ pip3 install -r requirements.txt
 rm -rf reports
 rm -rf screenshots
 mkdir screenshots
-cd src/tests/
-echo `pwd`
 pytest src/tests/test_login.py -sv -n 2 --browser chrome --html=reports/report.html
 
 
