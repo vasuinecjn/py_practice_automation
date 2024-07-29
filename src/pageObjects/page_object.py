@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
 import json
 from pathlib import Path
 
@@ -11,7 +12,10 @@ class Page:
     def __init__(self, driver, test_data):
         self.driver = driver
         self.test_data = test_data
-        self.webDriverWait = WebDriverWait(self.driver, 10)
+        self.webDriverWait = WebDriverWait(self.driver,
+                                           timeout=10,
+                                           poll_frequency=1,
+                                           ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
         locator_file_name = self.__class__.__name__ + ".json"
         locator_file_path = Path(__file__).parent.parent.parent.joinpath("objectRepository").joinpath(locator_file_name)
         if self.__class__.__name__ not in Page.page_locators_map.keys():
