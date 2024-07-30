@@ -46,7 +46,7 @@ def log_setup(request):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path.cwd().joinpath("logs").joinpath(f"{test_name}_{timestamp}.log")
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     # Create file handler which logs even debug messages
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
