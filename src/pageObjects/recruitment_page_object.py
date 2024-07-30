@@ -1,47 +1,50 @@
 import time
+from logging import Logger
 
 from faker import Faker
 
 from src.constants import TestConstants
-from src.pageObjects.page_object import Page, click_on, type_in
+from src.pageObjects.page_object import Page
 from pathlib import Path
 
-from src.utilities.stringUtils import get_clean_phone_number
+# from src.utilities.stringUtils import get_clean_phone_number
+from src.web_operations import WebOperation
 
 
 class RecruitmentPage(Page):
 
-    def __init__(self, driver, test_data):
-        super().__init__(driver, test_data)
+    def __init__(self, web_op: WebOperation, page_data: dict):
+        super().__init__(web_op, page_data)
         self.fake = Faker(['en_US'])
 
     def select_vacancy(self, vacancy):
-        print(vacancy)
-        click_on(self.get_element("ac_vacancy_dropdown"))
+        self.web_op.click(self.get_locator("ac_vacancy_dropdown"), "ac_vacancy_dropdown")
         time.sleep(2)
-        click_on(self.get_element("ac_vacancy_dropdown_option", vacancy))
+        self.web_op.click(self.get_locator("ac_vacancy_dropdown_option", vacancy), "ac_vacancy_dropdown_option")
 
     def upload_resume(self, resume_path):
-        type_in(self.get_element("ac_resume_upload_field"), str(Path.cwd().joinpath(resume_path)))
+        self.web_op.type(self.get_locator("ac_resume_upload_field"), str(Path.cwd().joinpath(resume_path)))
 
     def consent_to_keep_data(self, consent):
-        if consent == True:
-            click_on(self.get_element("ac_consent_to_keep_data_checkbox"))
+        if consent:
+            self.web_op.click(self.get_locator("ac_consent_to_keep_data_checkbox"), "ac_consent_to_keep_data_checkbox")
 
     def add_new_candidate(self, candidate):
-        candidate_dict = self.get_data(candidate)
-        click_on(self.get_element("add_candidate_button"))
-        type_in(self.get_element("ac_first_name"), self.fake.first_name())
-        type_in(self.get_element("ac_middle_name"), self.fake.first_name())
-        type_in(self.get_element("ac_last_name"), self.fake.last_name())
+        candidate_dict = self.get_page_data(candidate)
+        self.web_op.click(self.get_locator("add_candidate_button"), "add_candidate_button")
+        self.web_op.type(self.get_locator("ac_first_name"), self.fake.first_name())
+        self.web_op.type(self.get_locator("ac_middle_name"), self.fake.first_name())
+        self.web_op.type(self.get_locator("ac_last_name"), self.fake.last_name())
         self.select_vacancy([candidate_dict["vacancy"]])
-        type_in(self.get_element("ac_email_textbox"), self.fake.email())
-        type_in(self.get_element("ac_contact_number_textbox"), "1234567890")
+        self.web_op.type(self.get_locator("ac_email_textbox"), self.fake.email())
+        self.web_op.type(self.get_locator("ac_contact_number_textbox"), "1234567890")
         # self.upload_resume(candidate_dict["resume"])
-        type_in(self.get_element("ac_keywords_textbox"), ", ".join(self.fake.words(TestConstants.KEYWORDS_LENGTH)))
+        self.web_op.type(self.get_locator("ac_keywords_textbox"),
+                         ", ".join(self.fake.words(TestConstants.KEYWORDS_LENGTH)))
         # type_in(self.get_element("ac_date_of_application_field"), self.fake.date("%Y-%m-%d"))
-        type_in(self.get_element("ac_notes_textarea"), " ".join(self.fake.words(TestConstants.NOTES_LENGTH)))
+        self.web_op.type(self.get_locator("ac_notes_textarea"),
+                         " ".join(self.fake.words(TestConstants.NOTES_LENGTH)))
         self.consent_to_keep_data(candidate_dict["consent_to_keep_data"])
-        click_on(self.get_element("ac_save_button"))
+        self.web_op.click(self.get_locator("ac_save_button"), "ac_save_button")
         return self
 

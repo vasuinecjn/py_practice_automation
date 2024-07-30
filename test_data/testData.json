@@ -40,6 +40,19 @@
             "date_of_application": "date",
             "notes": "words",
             "consent_to_keep_data": true
+        },
+        "senior_support_specialist": {
+            "first_name": "first_name",
+            "middle_name": "first_name",
+            "last_name": "last_name",
+            "vacancy": "Senior Support Specialist",
+            "email": "email",
+            "contact_number": "phone_number",
+            "resume": "test_data/files/resume.txt",
+            "keywords": "words",
+            "date_of_application": "date",
+            "notes": "words",
+            "consent_to_keep_data": true
         }
     }
 }

@@ -1,45 +1,94 @@
-from .application import Application
+import os
 import settings
-import pytest
-import pytest_html
-from selenium import webdriver
 import json
 from pathlib import Path
 import re
+import logging
+from datetime import datetime
+import pytest
+import pytest_html
+from selenium import webdriver
+from src.application import Application
+from src.web_operations import WebOperation
 
 driver = None
 
 
 def pytest_addoption(parser):
     parser.addoption("--browser", action="store", default=settings.browser)
+    parser.addoption("--click_screenshot", action="store", default=settings.click_screenshot)
 
 
-def load_test_data():
-    test_data_map = {}
+def load_page_data():
+    page_data_dict = {}
     data_path = Path.cwd().joinpath("test_data").joinpath("testData.json")
     with open(data_path, "r") as f:
         data = json.load(f)
     f.close()
     for k in data.keys():
         for ki, v in data[k].items():
-            test_data_map[ki] = v
-    return test_data_map
+            page_data_dict[ki] = v
+    return page_data_dict
 
 
-@pytest.fixture
-def get_browser(request):
-    return request.config.getoption("--browser")
+@pytest.fixture(scope='function')
+def screenshot_dir(request):
+    test_name = request.node.name
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    screenshot_dir = os.path.join(Path.cwd().joinpath("screenshots"), test_name, timestamp)
+    os.makedirs(screenshot_dir, exist_ok=True)
+    return screenshot_dir
+
+
+@pytest.fixture(scope='function')
+def log_setup(request):
+    test_name = request.node.name
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = Path.cwd().joinpath("logs").joinpath(f"{test_name}_{timestamp}.log")
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    # Create file handler which logs even debug messages
+    fh = logging.FileHandler(log_file)
+    fh.setLevel(logging.DEBUG)
+    # Create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # Create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # Add the handlers to logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    yield logger
+    # Remove handlers after test to avoid duplicate logs in subsequent tests
+    logger.removeHandler(fh)
+    logger.removeHandler(ch)
 
 
 @pytest.fixture(scope="function")
-def init_test(request, get_browser):
+def init_test(request, log_setup, screenshot_dir):
     global driver
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('ignore-certificate-errors')
-    driver = webdriver.Chrome(options=chrome_options)
+    browser = request.config.getoption("--browser")
+    flag_dict = {"click_screenshot": request.config.getoption("--click_screenshot"),
+                 "browser": browser}
+    match browser:
+        case "chrome":
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("ignore-certificate-errors")
+            driver = webdriver.Chrome(options=chrome_options)
+        case "firefox":
+            firefox_options = webdriver.FirefoxOptions()
+            firefox_options.add_argument("ignore-certificate-errors")
+            driver = webdriver.Firefox(options=firefox_options)
+        case _:
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("ignore-certificate-errors")
+            driver = webdriver.Chrome(options=chrome_options)
     driver.maximize_window()
-    request.cls.driver = driver
-    request.cls.application = Application(driver, load_test_data())
+    logger = log_setup
+    web_op = WebOperation(driver, flag_dict, logger, screenshot_dir)
+    request.cls.application = Application(web_op, load_page_data())
     yield
     driver.close()
     driver.quit()
@@ -84,31 +133,3 @@ def pytest_runtest_makereport(item, call):
 
 def pytest_html_report_title(report):
     report.title = "Orange HRM Test Automation"
-
-
-
-# def pytest_addoption(parser):  #This will get the value from CLI /hooks
-#     parser.addoption('--browser')
-#
-#
-# @pytest.fixture()
-# def browser(request):  # This will return the Browser value to setup method
-#     return request.config.getoption('--browser')
-
-
-### pyTest html report ###
-
-# It is hook for adding environment info to HTML Report
-# def pytest_configure(config):
-#     config.stash[metadata_key]['Project Name'] = 'nop Commerce'
-#     config.stash[metadata_key]['Module Name'] = 'Customers'
-#     config.stash[metadata_key]['Tester'] = 'Sjn'
-
-
-# It is hook for delete/Modify Environment info to HTML Report
-# @pytest.hookimpl(optionalhook=True)
-# def pytest_metadata(metadata):
-#     metadata.pop('JAVA_HOME', None)
-#     metadata.pop('Plugins', None)
-
-

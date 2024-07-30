@@ -7,7 +7,7 @@ src/tests/server.log
 __pycache__/
 bmp.log
 server.log
-logs/pytest-logs.txt
+logs
 .project
 reports/
 screenshots/

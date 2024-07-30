@@ -1,13 +1,16 @@
 import time
-from src.pageObjects.page_object import Page, click_on, type_in
+from logging import Logger
+
+from src.pageObjects.page_object import Page
 from src.pageObjects.recruitment_page_object import RecruitmentPage
+from src.web_operations import WebOperation
 
 
 class HomePage(Page):
     expected = 4
 
-    def __init__(self, driver, test_data):
-        super().__init__(driver, test_data)
+    def __init__(self, web_op: WebOperation, page_data: dict):
+        super().__init__(web_op, page_data)
 
     # def logout(self):
     #     time.sleep(5)
@@ -18,5 +21,5 @@ class HomePage(Page):
     #     return LoginPage(self.driver, self.test_data)
 
     def navigate_to_recruitment_page(self):
-        click_on(self.get_element("recruitment_link"))
-        return RecruitmentPage(self.driver, self.test_data)
+        self.web_op.click(self.get_locator("recruitment_link"), "recruitment_link")
+        return RecruitmentPage(self.web_op, self.page_data)
