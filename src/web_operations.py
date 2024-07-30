@@ -55,10 +55,11 @@ class WebOperation:
                 return None
 
     def click(self, locator, screenshot_name):
+        by, value = locator.split("|")
+        element = self.get_element(by, value)
         if "yes" == self.flag_dict["click_screenshot"]:
             self.take_screenshot(screenshot_name)
-        by, value = locator.split("|")
-        self.get_element(by, value).click()
+        element.click()
 
     def type(self, locator, text):
         by, value = locator.split("|")
