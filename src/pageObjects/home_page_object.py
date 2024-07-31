@@ -21,5 +21,5 @@ class HomePage(Page):
     #     return LoginPage(self.driver, self.test_data)
 
     def navigate_to_recruitment_page(self):
-        self.web_op.click(self.get_locator("recruitment_link"), "recruitment_link")
+        self.web_op.click(self.get_locator("recruitment_link"))
         return RecruitmentPage(self.web_op, self.page_data)

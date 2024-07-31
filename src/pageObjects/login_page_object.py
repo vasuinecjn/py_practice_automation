@@ -14,5 +14,5 @@ class LoginPage(Page):
         login_data = self.get_page_data(login)
         self.web_op.type(self.get_locator("email_textbox"), login_data["userName"])
         self.web_op.type(self.get_locator("password_textbox"), login_data["password"])
-        self.web_op.click(self.get_locator("login_button"), "login_button")
+        self.web_op.click(self.get_locator("login_button"))
         return HomePage(self.web_op, self.page_data)

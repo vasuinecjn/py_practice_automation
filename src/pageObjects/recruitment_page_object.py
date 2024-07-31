@@ -18,24 +18,24 @@ class RecruitmentPage(Page):
         self.fake = Faker(['en_US'])
 
     def select_vacancy(self, vacancy):
-        self.web_op.click(self.get_locator("ac_vacancy_dropdown"), "ac_vacancy_dropdown")
+        self.web_op.click(self.get_locator("ac_vacancy_dropdown"))
         time.sleep(2)
-        self.web_op.click(self.get_locator("ac_vacancy_dropdown_option", vacancy), "ac_vacancy_dropdown_option")
+        self.web_op.click(self.get_locator("ac_vacancy_dropdown_option"), [vacancy])
 
     def upload_resume(self, resume_path):
         self.web_op.type(self.get_locator("ac_resume_upload_field"), str(Path.cwd().joinpath(resume_path)))
 
     def consent_to_keep_data(self, consent):
         if consent:
-            self.web_op.click(self.get_locator("ac_consent_to_keep_data_checkbox"), "ac_consent_to_keep_data_checkbox")
+            self.web_op.click(self.get_locator("ac_consent_to_keep_data_checkbox"))
 
     def add_new_candidate(self, candidate):
         candidate_dict = self.get_page_data(candidate)
-        self.web_op.click(self.get_locator("add_candidate_button"), "add_candidate_button")
+        self.web_op.click(self.get_locator("add_candidate_button"))
         self.web_op.type(self.get_locator("ac_first_name"), self.fake.first_name())
         self.web_op.type(self.get_locator("ac_middle_name"), self.fake.first_name())
         self.web_op.type(self.get_locator("ac_last_name"), self.fake.last_name())
-        self.select_vacancy([candidate_dict["vacancy"]])
+        self.select_vacancy(candidate_dict["vacancy"])
         self.web_op.type(self.get_locator("ac_email_textbox"), self.fake.email())
         self.web_op.type(self.get_locator("ac_contact_number_textbox"), "1234567890")
         # self.upload_resume(candidate_dict["resume"])
@@ -45,6 +45,6 @@ class RecruitmentPage(Page):
         self.web_op.type(self.get_locator("ac_notes_textarea"),
                          " ".join(self.fake.words(TestConstants.NOTES_LENGTH)))
         self.consent_to_keep_data(candidate_dict["consent_to_keep_data"])
-        self.web_op.click(self.get_locator("ac_save_button"), "ac_save_button")
+        self.web_op.click(self.get_locator("ac_save_button"))
         return self
 

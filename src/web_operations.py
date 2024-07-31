@@ -4,7 +4,7 @@ from datetime import datetime
 from selenium.common import StaleElementReferenceException, NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-# from src.utilities.stringUtils import replace_locator_placeholders
+from src.utilities.stringUtils import replace_locator_placeholders
 from selenium.webdriver.support import expected_conditions as ec
 
 
@@ -54,15 +54,23 @@ class WebOperation:
             case _:
                 return None
 
-    def click(self, locator, screenshot_name):
-        by, value = locator.split("|")
-        element = self.get_element(by, value)
+    def click(self, locator_tuple, *args):
+        locator_key, locator_value = locator_tuple[0], locator_tuple[1]
+        if len(args) > 0:
+            locator_value = replace_locator_placeholders(locator_value, args[0])
+        self.logger.info(f"click on '{locator_key}'")
+        by, locator = locator_value.split("|")
+        element = self.get_element(by, locator)
         if "yes" == self.flag_dict["click_screenshot"]:
-            self.take_screenshot(screenshot_name)
+            self.take_screenshot(locator_key)
         element.click()
 
-    def type(self, locator, text):
-        by, value = locator.split("|")
+    def type(self, locator_tuple, text, *args):
+        locator_key, locator_value = locator_tuple[0], locator_tuple[1]
+        if len(args) > 0:
+            locator_value = replace_locator_placeholders(locator_value, args[0])
+        self.logger.info(f"type '{text}' in '{locator_key}'")
+        by, value = locator_value.split("|")
         element = self.get_element(by, value)
         element.clear()
         element.send_keys(text)

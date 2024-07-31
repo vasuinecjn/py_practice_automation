@@ -3,7 +3,6 @@ import time
 import json
 from logging import Logger
 from pathlib import Path
-from src.utilities.stringUtils import replace_locator_placeholders
 from src.web_operations import WebOperation
 
 
@@ -21,18 +20,18 @@ class Page:
             f.close()
             Page.page_locators_dict[self.__class__.__name__] = data
 
-    def get_locator(self, key: str, *args):
+    def get_locator(self, key: str):
         locator = Page.page_locators_dict[self.__class__.__name__][key]
-        if len(args) > 0:
-            locator = replace_locator_placeholders(locator, args[0])
-        return locator
+        # if len(args) > 0:
+        #     locator = replace_locator_placeholders(locator, args[0])
+        return tuple([key, locator])
 
     def get_page_data(self, key):
         return self.page_data[key]
 
     def logout(self):
         time.sleep(5)
-        self.web_op.click(self.get_locator("user_dropdown"), "user_dropdown")
-        self.web_op.click(self.get_locator("logout_link"), "logout_link")
+        self.web_op.click(self.get_locator("user_dropdown"))
+        self.web_op.click(self.get_locator("logout_link"))
 
 

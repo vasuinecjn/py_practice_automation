@@ -13,4 +13,4 @@ mkdir logs
 
 #pytest src/tests/test_login.py -sv -n 2 --browser chrome --html=reports/report.html
 #pytest src/tests/test_add_recruitment.py -n 2 --browser firefox --click_screenshot yes --html=reports/report.html
-pytest src/tests/test_add_recruitment.py -n 2 --browser chrome --click_screenshot yes --html=reports/report.html
+pytest src/tests/test_add_recruitment.py -n 1 --browser chrome --click_screenshot yes --html=reports/report.html
