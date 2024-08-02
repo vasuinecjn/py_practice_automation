@@ -41,11 +41,11 @@
             "notes": "words",
             "consent_to_keep_data": true
         },
-        "senior_support_specialist": {
+        "payroll_administrator": {
             "first_name": "first_name",
             "middle_name": "first_name",
             "last_name": "last_name",
-            "vacancy": "Senior Support Specialist",
+            "vacancy": "Payroll Administrator",
             "email": "email",
             "contact_number": "phone_number",
             "resume": "test_data/files/resume.txt",

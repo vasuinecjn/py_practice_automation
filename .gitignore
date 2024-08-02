@@ -11,3 +11,4 @@ logs
 .project
 reports/
 screenshots/
+.DS_Store

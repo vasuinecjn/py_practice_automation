@@ -10,6 +10,7 @@ import pytest_html
 from selenium import webdriver
 from src.application import Application
 from src.web_operations import WebOperation
+from zipfile import ZipFile, ZIP_DEFLATED
 
 driver = None
 
@@ -41,7 +42,7 @@ def screenshot_dir(request):
 
 
 @pytest.fixture(scope='function')
-def log_setup(request):
+def logger(request):
     test_name = request.node.name
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path.cwd().joinpath("logs").joinpath(f"{test_name}_{timestamp}.log")
@@ -67,7 +68,7 @@ def log_setup(request):
 
 
 @pytest.fixture(scope="function")
-def init_test(request, log_setup, screenshot_dir):
+def init_test(request, logger, screenshot_dir):
     global driver
     browser = request.config.getoption("--browser")
     flag_dict = {"click_screenshot": request.config.getoption("--click_screenshot"),
@@ -86,12 +87,18 @@ def init_test(request, log_setup, screenshot_dir):
             chrome_options.add_argument("ignore-certificate-errors")
             driver = webdriver.Chrome(options=chrome_options)
     driver.maximize_window()
-    logger = log_setup
+    logger = logger
     web_op = WebOperation(driver, flag_dict, logger, screenshot_dir)
     request.cls.application = Application(web_op, load_page_data())
     yield
     driver.close()
     driver.quit()
+    zip_filename = f"{os.path.basename(screenshot_dir)}_{request.node.name}.zip"
+    zip_filepath = os.path.join(str(Path(screenshot_dir).parent), zip_filename)
+    with ZipFile(zip_filepath, mode="w", compression=ZIP_DEFLATED) as ss_zip_file:
+        for file in Path(screenshot_dir).glob("*.png"):
+            ss_zip_file.write(file, arcname=file.name)
+        ss_zip_file.close()
 
 
 def pytest_generate_tests(metafunc):
@@ -115,7 +122,19 @@ def pytest_runtest_makereport(item, call):
     # pytest_html = item.config.pluginmanager.getplugin("html")
     outcome = yield
     report = outcome.get_result()
+    print(item.funcargs)
+    print(item.cls.application.web_op.screenshot_dir if hasattr(item.cls.application.web_op, "screenshot_dir") else "no screen shot directory")
+    # zip_filepath = None
+    if hasattr(item.cls.application.web_op, "screenshot_dir") :
+        ss_dir = item.cls.application.web_op.screenshot_dir
+        zip_filename = f"{os.path.basename(ss_dir)}_{item.name}.zip"
+        zip_filepath = os.path.join(str(Path(ss_dir).parent), zip_filename)
+    else:
+        zip_filepath = None
+    ss_zip = "<div><img src='%s' alt='zip_screenshot' style='width:80px;height:80px;'" \
+           "onclick='window.open(this.src)' align='right'/></div>" % zip_filepath
     extra = getattr(report, "extra", [])
+    extra.append(pytest_html.extras.html(ss_zip))
     # Check if the test failed
     if report.when == "call" or report.when == "setup":
         xfail = hasattr(report, "wasxfail")
