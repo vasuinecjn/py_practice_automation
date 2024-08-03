@@ -123,16 +123,16 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     print(item.funcargs)
-    print(item.cls.application.web_op.screenshot_dir if hasattr(item.cls.application.web_op, "screenshot_dir") else "no screen shot directory")
-    # zip_filepath = None
-    if hasattr(item.cls.application.web_op, "screenshot_dir") :
+    print(item.cls.application.web_op.screenshot_dir if hasattr(item.cls.application.web_op,
+                                                                "screenshot_dir") else "no screen shot directory")
+    if hasattr(item.cls.application.web_op, "screenshot_dir"):
         ss_dir = item.cls.application.web_op.screenshot_dir
         zip_filename = f"{os.path.basename(ss_dir)}_{item.name}.zip"
         zip_filepath = os.path.join(str(Path(ss_dir).parent), zip_filename)
     else:
         zip_filepath = None
-    ss_zip = "<div><img src='%s' alt='zip_screenshot' style='width:80px;height:80px;'" \
-           "onclick='window.open(this.src)' align='right'/></div>" % zip_filepath
+    ss_zip = f"<div><img src='{zip_filepath}' alt='zip_screenshot' style='width:150px;height:100px;'" \
+             "onclick='window.open(this.src)' align='right'/></div>"
     extra = getattr(report, "extra", [])
     extra.append(pytest_html.extras.html(ss_zip))
     # Check if the test failed
@@ -141,11 +141,11 @@ def pytest_runtest_makereport(item, call):
         if (report.skipped and xfail) or (report.failed and not xfail):
             m = re.search(r"\[([A-Za-z0-9_]+)\]", item.nodeid)
             test_case = m.group(1)
-            file_name = Path.cwd().joinpath("screenshots").joinpath(test_case + ".png")
+            file_name = Path.cwd().joinpath("screenshots").joinpath(f"{test_case}.png")
             driver.get_screenshot_as_file(file_name)
             if file_name:
-                html = "<div><img src='%s' alt='screenshot' style='width:304px;height:228px;'" \
-                        "onclick='window.open(this.src)' align='right'/></div>" % file_name
+                html = f"<div><img src='{file_name}' alt='screenshot' style='width:304px;height:228px;'" \
+                       "onclick='window.open(this.src)' align='right'/></div>"
                 extra.append(pytest_html.extras.html(html))
         report.extra = extra
 

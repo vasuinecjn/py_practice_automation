@@ -19,6 +19,6 @@ mkdir -p logs
 ##        --alluredir=reports and run `allure serve reports` to generate reports
 
 #pytest src/tests/test_login.py -sv -n 2 --browser chrome --click_screenshot yes --html=reports/report.html
-pytest src/tests/test_add_recruitment.py -sv -n 1 --browser firefox --click_screenshot yes --html=reports/report.html
+pytest src/tests/test_add_recruitment.py -sv -n 2 --browser firefox --click_screenshot yes --html=reports/report.html
 #pytest src/tests/test_add_recruitment.py -n 1 --browser chrome --click_screenshot yes --alluredir=reports
 #allure serve reports
