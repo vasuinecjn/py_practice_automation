@@ -103,7 +103,10 @@ def init_test(request, logger, screenshot_dir):
 
 def pytest_generate_tests(metafunc):
     test_cases = []
-    file_name = metafunc.cls.__name__ + ".json"
+    # file_name = metafunc.cls.__name__ + ".json"
+    test_instance = metafunc.cls.__class__
+    file_name = metafunc.cls.get_test_file(test_instance)
+
     test_cases_file_path = Path.cwd().joinpath("test_cases").joinpath(file_name)
     if "test_case" in metafunc.fixturenames:
         with open(test_cases_file_path, "r") as f:
@@ -139,9 +142,7 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call" or report.when == "setup":
         xfail = hasattr(report, "wasxfail")
         if (report.skipped and xfail) or (report.failed and not xfail):
-            m = re.search(r"\[([A-Za-z0-9_]+)\]", item.nodeid)
-            test_case = m.group(1)
-            file_name = Path.cwd().joinpath("screenshots").joinpath(f"{test_case}.png")
+            file_name = Path.cwd().joinpath("screenshots").joinpath(f"{item.name}.png")
             driver.get_screenshot_as_file(file_name)
             if file_name:
                 html = f"<div><img src='{file_name}' alt='screenshot' style='width:304px;height:228px;'" \

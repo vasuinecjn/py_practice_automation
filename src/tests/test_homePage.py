@@ -4,6 +4,9 @@ from src.constants import TestConstants
 
 class TestHomePage(BaseTest):
 
+    def get_test_file(self):
+        return "TestHomePage.json"
+
     def test_home_page(self, test_case):
-        print("Test Name is ", test_case["testName"])
-        self.web_op.get_driver().get(TestConstants.BASE_URL)
+        self.get_logger().info("Test Name is " + test_case["testName"])
+        self.get_application().web_op.get_driver().get(TestConstants.BASE_URL)
