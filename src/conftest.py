@@ -20,6 +20,11 @@ def pytest_addoption(parser):
     parser.addoption("--click_screenshot", action="store", default=settings.click_screenshot)
 
 
+def get_test_name(name):
+    return name.replace("[", ".").replace("]", "")
+
+
+@pytest.fixture(scope="session")
 def load_page_data():
     page_data_dict = {}
     data_path = Path.cwd().joinpath("test_data").joinpath("testData.json")
@@ -32,18 +37,18 @@ def load_page_data():
     return page_data_dict
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def screenshot_dir(request):
-    test_name = request.node.name
+    test_name = get_test_name(str(request.node.name))
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     screenshot_dir = os.path.join(Path.cwd().joinpath("screenshots"), test_name, timestamp)
     os.makedirs(screenshot_dir, exist_ok=True)
     return screenshot_dir
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def logger(request):
-    test_name = request.node.name
+    test_name = get_test_name(str(request.node.name))
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path.cwd().joinpath("logs").joinpath(f"{test_name}_{timestamp}.log")
     logger = logging.getLogger()
@@ -68,8 +73,9 @@ def logger(request):
 
 
 @pytest.fixture(scope="function")
-def init_test(request, logger, screenshot_dir):
+def init_test(request, logger, screenshot_dir, load_page_data):
     global driver
+    test_name = get_test_name(str(request.node.name))
     browser = request.config.getoption("--browser")
     flag_dict = {"click_screenshot": request.config.getoption("--click_screenshot"),
                  "browser": browser}
@@ -87,13 +93,13 @@ def init_test(request, logger, screenshot_dir):
             chrome_options.add_argument("ignore-certificate-errors")
             driver = webdriver.Chrome(options=chrome_options)
     driver.maximize_window()
-    logger = logger
     web_op = WebOperation(driver, flag_dict, logger, screenshot_dir)
-    request.cls.application = Application(web_op, load_page_data())
+    request.cls.application = Application(web_op, load_page_data)
+    request.cls.test_name = test_name
     yield
     driver.close()
     driver.quit()
-    zip_filename = f"{os.path.basename(screenshot_dir)}_{request.node.name}.zip"
+    zip_filename = f"{os.path.basename(screenshot_dir)}_{test_name}.zip"
     zip_filepath = os.path.join(str(Path(screenshot_dir).parent), zip_filename)
     with ZipFile(zip_filepath, mode="w", compression=ZIP_DEFLATED) as ss_zip_file:
         for file in Path(screenshot_dir).glob("*.png"):
@@ -103,11 +109,10 @@ def init_test(request, logger, screenshot_dir):
 
 def pytest_generate_tests(metafunc):
     test_cases = []
-    # file_name = metafunc.cls.__name__ + ".json"
     test_instance = metafunc.cls.__class__
-    file_name = metafunc.cls.get_test_file(test_instance)
+    test_class_file_name = metafunc.cls.get_test_file(test_instance)
 
-    test_cases_file_path = Path.cwd().joinpath("test_cases").joinpath(file_name)
+    test_cases_file_path = Path.cwd().joinpath("test_cases").joinpath(test_class_file_name)
     if "test_case" in metafunc.fixturenames:
         with open(test_cases_file_path, "r") as f:
             data = json.load(f)
@@ -130,7 +135,7 @@ def pytest_runtest_makereport(item, call):
                                                                 "screenshot_dir") else "no screen shot directory")
     if hasattr(item.cls.application.web_op, "screenshot_dir"):
         ss_dir = item.cls.application.web_op.screenshot_dir
-        zip_filename = f"{os.path.basename(ss_dir)}_{item.name}.zip"
+        zip_filename = f"{os.path.basename(ss_dir)}_{get_test_name(str(item.name))}.zip"
         zip_filepath = os.path.join(str(Path(ss_dir).parent), zip_filename)
     else:
         zip_filepath = None
@@ -142,7 +147,7 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call" or report.when == "setup":
         xfail = hasattr(report, "wasxfail")
         if (report.skipped and xfail) or (report.failed and not xfail):
-            file_name = Path.cwd().joinpath("screenshots").joinpath(f"{item.name}.png")
+            file_name = Path.cwd().joinpath("screenshots").joinpath(f"{get_test_name(str(item.name))}.png")
             driver.get_screenshot_as_file(file_name)
             if file_name:
                 html = f"<div><img src='{file_name}' alt='screenshot' style='width:304px;height:228px;'" \
