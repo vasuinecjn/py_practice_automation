@@ -1,14 +1,17 @@
 import os
+import time
+
 import settings
 import json
 from pathlib import Path
-import re
 import logging
 from datetime import datetime
 import pytest
 import pytest_html
-from selenium import webdriver
+from seleniumwire import webdriver
 from src.application import Application
+from src.utilities.har_file_generator import generate_har_file
+from src.utilities.log_excluder import ExcludeSeleniumLogsFilter
 from src.web_operations import WebOperation
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -37,6 +40,63 @@ def load_page_data():
     return page_data_dict
 
 
+def filter_logs(filters):
+    return not any(filter in filter.pathname for filter in filters)
+
+
+# def generate_har_file(driver, har_file_path):
+#     # Extract requests and responses captured by Selenium Wire
+#     har_data = {
+#         "log": {
+#             "version": "1.2",
+#             "creator": {
+#                 "name": "Selenium Wire",
+#                 "version": "4.6.0"
+#             },
+#             "entries": []
+#         }
+#     }
+#     for request in driver.requests:
+#         if request.response:
+#             entry = {
+#                 "startedDateTime": request.date.isoformat(),
+#                 "time": (request.response.date - request.date).microseconds / 1000,
+#                 "request": {
+#                     "method": request.method,
+#                     "url": request.url,
+#                     "httpVersion": "HTTP/1.1",
+#                     "headers": [{"name": k, "value": v} for k, v in request.headers.items()],
+#                     "queryString": [{"name": k, "value": v} for k, v in request.params.items()],
+#                     "headersSize": -1,
+#                     "bodySize": -1
+#                 },
+#                 "response": {
+#                     "status": request.response.status_code,
+#                     "statusText": request.response.reason,
+#                     "httpVersion": "HTTP/1.1",
+#                     "headers": [{"name": k, "value": v} for k, v in request.response.headers.items()],
+#                     "content": {
+#                         "size": len(request.response.body),
+#                         "mimeType": request.response.headers.get("Content-Type", "")
+#                     },
+#                     "redirectURL": "",
+#                     "headersSize": -1,
+#                     "bodySize": -1
+#                 },
+#                 "cache": {},
+#                 "timings": {
+#                     "send": 0,
+#                     "wait": 0,
+#                     "receive": 0
+#                 }
+#             }
+#             har_data["log"]["entries"].append(entry)
+#
+#     # Write HAR data to a file
+#     with open(har_file_path, 'w') as har_file:
+#         json.dump(har_data, har_file, indent=4)
+
+
 @pytest.fixture(scope="function")
 def screenshot_dir(request):
     test_name = get_test_name(str(request.node.name))
@@ -47,17 +107,28 @@ def screenshot_dir(request):
 
 
 @pytest.fixture(scope="function")
+def har_dir(request):
+    test_name = get_test_name(str(request.node.name))
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    har_dir = os.path.join(Path.cwd().joinpath("har"), test_name, timestamp)
+    os.makedirs(har_dir, exist_ok=True)
+    return har_dir
+
+
+@pytest.fixture(scope="function")
 def logger(request):
     test_name = get_test_name(str(request.node.name))
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path.cwd().joinpath("logs").joinpath(f"{test_name}_{timestamp}.log")
-    logger = logging.getLogger()
+    logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     # Create file handler which logs even debug messages
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
+    fh.addFilter(ExcludeSeleniumLogsFilter())
     # Create console handler with a higher log level
     ch = logging.StreamHandler()
+    ch.addFilter(ExcludeSeleniumLogsFilter())
     ch.setLevel(logging.ERROR)
     # Create formatter and add it to the handlers
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -73,7 +144,7 @@ def logger(request):
 
 
 @pytest.fixture(scope="function")
-def init_test(request, logger, screenshot_dir, load_page_data):
+def init_test(request, logger, screenshot_dir, load_page_data, har_dir):
     global driver
     test_name = get_test_name(str(request.node.name))
     browser = request.config.getoption("--browser")
@@ -82,29 +153,37 @@ def init_test(request, logger, screenshot_dir, load_page_data):
     match browser:
         case "chrome":
             chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument("ignore-certificate-errors")
+            # chrome_options.add_argument("ignore-certificate-errors")
+            chrome_options.add_argument("log-level=3")
             driver = webdriver.Chrome(options=chrome_options)
         case "firefox":
             firefox_options = webdriver.FirefoxOptions()
-            firefox_options.add_argument("ignore-certificate-errors")
+            # firefox_options.add_argument("ignore-certificate-errors")
+            firefox_options.add_argument("log-level=3")
             driver = webdriver.Firefox(options=firefox_options)
         case _:
             chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument("ignore-certificate-errors")
+            # chrome_options.add_argument("ignore-certificate-errors")
+            chrome_options.add_argument("log-level=3")
             driver = webdriver.Chrome(options=chrome_options)
+    driver.scopes = [".*"]
     driver.maximize_window()
     web_op = WebOperation(driver, flag_dict, logger, screenshot_dir)
     request.cls.application = Application(web_op, load_page_data)
     request.cls.test_name = test_name
     yield
-    driver.close()
-    driver.quit()
+    generate_har_file(driver, os.path.join(str(Path(har_dir)), f"{test_name}.har"))
     zip_filename = f"{os.path.basename(screenshot_dir)}_{test_name}.zip"
     zip_filepath = os.path.join(str(Path(screenshot_dir).parent), zip_filename)
     with ZipFile(zip_filepath, mode="w", compression=ZIP_DEFLATED) as ss_zip_file:
         for file in Path(screenshot_dir).glob("*.png"):
             ss_zip_file.write(file, arcname=file.name)
         ss_zip_file.close()
+    try:
+        driver.quit()
+        driver.close()
+    except Exception:
+        pass
 
 
 def pytest_generate_tests(metafunc):

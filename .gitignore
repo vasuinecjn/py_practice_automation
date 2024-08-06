@@ -11,4 +11,6 @@ logs
 .project
 reports/
 screenshots/
+har
+browsermob-proxy-2.1.4
 .DS_Store

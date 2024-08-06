@@ -6,10 +6,12 @@ pip3 install -r requirements.txt
 rm -rf reports
 rm -rf screenshots
 rm -rf logs
+rm -rf har
 
 mkdir -p reports
 mkdir -p screenshots
 mkdir -p logs
+mkdir -p har
 
 ### for report do the followinbg:
 ###-------------------------------------------------------------------------------

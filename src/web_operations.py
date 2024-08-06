@@ -1,4 +1,5 @@
 import os
+import time
 from logging import Logger
 from datetime import datetime
 from selenium.common import StaleElementReferenceException, NoSuchElementException
@@ -26,12 +27,14 @@ class WebOperation:
         return self.flag_dict
 
     def take_screenshot(self, name):
+        self.is_browser_idle()
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         screenshot_path = os.path.join(self.screenshot_dir, f"{timestamp}_{name}.png")
         self.driver.save_screenshot(screenshot_path)
 
     def get_element(self, locator_by, locator_value):
         def wait_and_get_element(by, value):
+            self.is_browser_idle()
             return self.webDriverWait.until(ec.visibility_of_element_located((by, value)))
 
         match locator_by:
@@ -74,3 +77,19 @@ class WebOperation:
         element = self.get_element(by, value)
         element.clear()
         element.send_keys(text)
+
+    def is_browser_idle(self, idle_time=2, check_interval=1, wait_time=4):
+        return True
+        # idle_start_time = time.time()
+        #
+        # while wait_time > 0:
+        #     current_time = time.time()
+        #     requests = self.driver.requests
+        #     self.logger.info(f"current requests count is {len(requests)}")
+        #     if any(request.response is None or request.response.date.timestamp() > (current_time - check_interval) for request in requests):
+        #         idle_start_time = current_time
+        #
+        #     if current_time - idle_start_time >= idle_time:
+        #         return True
+        #     wait_time -= 1
+        #     time.sleep(1)

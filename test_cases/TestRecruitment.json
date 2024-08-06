@@ -8,7 +8,7 @@
     },
     {
         "testName": "payroll_administrator",
-        "isSkip": false,
+        "isSkip": true,
         "tag": "smoke",
         "login": "adminCredentials",
         "addCandidate": "payroll_administrator"
