@@ -1,6 +1,4 @@
 import os
-import time
-
 import settings
 import json
 from pathlib import Path
@@ -42,59 +40,6 @@ def load_page_data():
 
 def filter_logs(filters):
     return not any(filter in filter.pathname for filter in filters)
-
-
-# def generate_har_file(driver, har_file_path):
-#     # Extract requests and responses captured by Selenium Wire
-#     har_data = {
-#         "log": {
-#             "version": "1.2",
-#             "creator": {
-#                 "name": "Selenium Wire",
-#                 "version": "4.6.0"
-#             },
-#             "entries": []
-#         }
-#     }
-#     for request in driver.requests:
-#         if request.response:
-#             entry = {
-#                 "startedDateTime": request.date.isoformat(),
-#                 "time": (request.response.date - request.date).microseconds / 1000,
-#                 "request": {
-#                     "method": request.method,
-#                     "url": request.url,
-#                     "httpVersion": "HTTP/1.1",
-#                     "headers": [{"name": k, "value": v} for k, v in request.headers.items()],
-#                     "queryString": [{"name": k, "value": v} for k, v in request.params.items()],
-#                     "headersSize": -1,
-#                     "bodySize": -1
-#                 },
-#                 "response": {
-#                     "status": request.response.status_code,
-#                     "statusText": request.response.reason,
-#                     "httpVersion": "HTTP/1.1",
-#                     "headers": [{"name": k, "value": v} for k, v in request.response.headers.items()],
-#                     "content": {
-#                         "size": len(request.response.body),
-#                         "mimeType": request.response.headers.get("Content-Type", "")
-#                     },
-#                     "redirectURL": "",
-#                     "headersSize": -1,
-#                     "bodySize": -1
-#                 },
-#                 "cache": {},
-#                 "timings": {
-#                     "send": 0,
-#                     "wait": 0,
-#                     "receive": 0
-#                 }
-#             }
-#             har_data["log"]["entries"].append(entry)
-#
-#     # Write HAR data to a file
-#     with open(har_file_path, 'w') as har_file:
-#         json.dump(har_data, har_file, indent=4)
 
 
 @pytest.fixture(scope="function")
@@ -168,7 +113,7 @@ def init_test(request, logger, screenshot_dir, load_page_data, har_dir):
             driver = webdriver.Chrome(options=chrome_options)
     driver.scopes = [".*"]
     driver.maximize_window()
-    web_op = WebOperation(driver, flag_dict, logger, screenshot_dir)
+    web_op = WebOperation(driver, flag_dict, logger, screenshot_dir, har_dir)
     request.cls.application = Application(web_op, load_page_data)
     request.cls.test_name = test_name
     yield
@@ -180,8 +125,8 @@ def init_test(request, logger, screenshot_dir, load_page_data, har_dir):
             ss_zip_file.write(file, arcname=file.name)
         ss_zip_file.close()
     try:
-        driver.quit()
         driver.close()
+        driver.quit()
     except Exception:
         pass
 
@@ -218,10 +163,19 @@ def pytest_runtest_makereport(item, call):
         zip_filepath = os.path.join(str(Path(ss_dir).parent), zip_filename)
     else:
         zip_filepath = None
-    ss_zip = f"<div><img src='{zip_filepath}' alt='zip_screenshot' style='width:150px;height:100px;'" \
-             "onclick='window.open(this.src)' align='right'/></div>"
+    html_for_ss_zip = f"<div><img src='{zip_filepath}' alt='zip_screenshot' style='width:150px;height:100px;'" \
+                      "onclick='window.open(this.src)' align='right'/></div>"
+    if hasattr(item.cls.application.web_op, "har_dir"):
+        har_loc = item.cls.application.web_op.har_dir
+        har_file_name = f"{get_test_name(str(item.name))}.har"
+        har_file_path = os.path.join(har_loc, har_file_name)
+    else:
+        har_file_path = None
+    html_for_har_file = f"<div><img src='{har_file_path}' alt='har_file' style='width:150px;height:100px;'" \
+                        "onclick='window.open(this.src)' align='right'/></div>"
     extra = getattr(report, "extra", [])
-    extra.append(pytest_html.extras.html(ss_zip))
+    extra.append(pytest_html.extras.html(html_for_ss_zip))
+    extra.append(pytest_html.extras.html(html_for_har_file))
     # Check if the test failed
     if report.when == "call" or report.when == "setup":
         xfail = hasattr(report, "wasxfail")

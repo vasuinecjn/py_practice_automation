@@ -10,11 +10,12 @@ from selenium.webdriver.support import expected_conditions as ec
 
 
 class WebOperation:
-    def __init__(self, web_driver, flag_dict, logger: Logger, screenshot_dir):
+    def __init__(self, web_driver, flag_dict, logger: Logger, screenshot_dir, har_dir):
         self.driver = web_driver
         self.flag_dict = flag_dict
         self.logger = logger
         self.screenshot_dir = screenshot_dir
+        self.har_dir = har_dir
         self.webDriverWait = WebDriverWait(web_driver,
                                            timeout=10,
                                            poll_frequency=1,
