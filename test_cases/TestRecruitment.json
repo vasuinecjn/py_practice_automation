@@ -1,0 +1,16 @@
+[
+    {
+        "testName": "Senior_QA_Lead",
+        "isSkip": false,
+        "tag": "smoke",
+        "login": "adminCredentials",
+        "addCandidate": "senior_qa_lead_candidate"
+    },
+    {
+        "testName": "payroll_administrator",
+        "isSkip": true,
+        "tag": "smoke",
+        "login": "adminCredentials",
+        "addCandidate": "payroll_administrator"
+    }
+]

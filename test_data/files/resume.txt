@@ -1,0 +1,1 @@
+API Testing: Experienced in testing RESTful web services, validating JSON and XML formatted data, and working with HTTP source codes using tools like Postman.

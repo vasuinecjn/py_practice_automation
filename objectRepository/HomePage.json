@@ -1,0 +1,5 @@
+{
+    "logout_link": "link_text|Logout",
+    "user_dropdown": "css_selector|.oxd-topbar-header-userarea span",
+    "recruitment_link": "css_selector|a[href*='viewRecruitmentModule']"
+}

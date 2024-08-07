@@ -1,0 +1,5 @@
+{
+    "email_textbox": "name|username",
+    "password_textbox": "name|password",
+    "login_button": "css_selector|button[type='submit']"
+}
